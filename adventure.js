@@ -77,7 +77,7 @@ class AdventureScene extends Phaser.Scene {
         this.mousex = x;
         this.mousey = y;
         if (this.heldItem != null) {
-            this.heldItem.setPosition(x,y);
+            this.heldItem.setPosition(x - this.heldItem.width/2, y);
         } 
         else {
             this.input.setDefaultCursor('default');
@@ -150,23 +150,49 @@ class AdventureScene extends Phaser.Scene {
     }
 
     spawnItem(itemName, x, y, pointerOverText, pointerDownText) {
-        let item = this.add.text(x, y, itemName)
-        .setFontSize(this.s * 2)
-        .setInteractive()
-        .on('pointerover', () => {
-            this.showMessage(pointerOverText)
-        })
-        .on('pointerdown', () => {
-            this.showMessage(pointerDownText);
-            this.gainItem(itemName);
-            this.tweens.add({
-                targets: item,
-                y: `-=${2 * this.s}`,
-                alpha: { from: 1, to: 0 },
-                duration: 500,
-                onComplete: () => item.destroy()
+        let item = this.add.text(x, y, itemName).setFontSize(this.s * 2);
+        this.tweens.add({
+            targets: item,
+            y: `+=${2 * this.s}`,
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            onComplete: () => {
+                item.setInteractive()
+                    .on('pointerover', () => {
+                        this.showMessage(pointerOverText)
+                    })
+                    .on('pointerdown', () => {
+                        this.showMessage(pointerDownText);
+                        this.gainItem(itemName);
+                        this.tweens.add({
+                            targets: item,
+                            y: `-=${2 * this.s}`,
+                            alpha: { from: 1, to: 0 },
+                            duration: 500,
+                            onComplete: () => item.destroy()
+                        });
+                    })
+            }
+        });
+    }
+
+    createDoorway(text, x, y, overText, scene) {
+        this.add.text(x, y, text)
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                this.showMessage(overText);
+            })
+            .on('pointerdown', () => {
+                this.gotoScene(scene);
             });
-        })
+    }
+
+    createEntity(text, x, y, txtColor="#00FFF0") {
+        let entity = this.add.text(x, y, text, {color:txtColor,})
+            .setFontSize(this.s * 2)
+            .setInteractive();
+        return entity
     }
 
     itemGrabbed(item) {

@@ -28,10 +28,8 @@ class HallwayToMainArea extends AdventureScene {
         //         });
         //     });
 
-        let skeleton = this.add.text(1000, 667, "Skeleton")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
+        let skeleton = this.createEntity("Skeleton", 1000, 667);
+        skeleton.on('pointerover', () => {
                 this.showMessage("Hmm this skeleton might have a key.");
             })
             .on('pointerdown', () => {
@@ -86,61 +84,205 @@ class HallwayToMainArea extends AdventureScene {
         //     this.scene.start('loading');
         //     // go_to_scene(this,'loading','tip1')
         // });
-
-        let door = this.add.text(520, 512, "🚪 locked door", {color:"#00FFF0",})
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
+            
+        let door = this.createEntity("🚪 locked door", 520, 512);
+        door.on('pointerover', () => {
                 if (this.hasItem("Skeleton Key")) {
                     this.showMessage("I have the key for this door.");
                 } else {
                     this.showMessage("It's locked. I need to find a key.");
                 }
-                // console.log(this.holdingItem("key"));
             })
             .on('pointerdown', () => {
                 if (this.holdingItem("Skeleton Key")) {
                     this.loseItem("Skeleton Key");
                     this.showMessage("*squeak*");
                     door.setText("Unlocked Door");
-                    this.gotoScene('demo2');
+                    this.gotoScene('MainArea');
                 }
                 else {
                     this.showMessage("Locked. I'll need to find a key.");
                 }
-            })
+            });
+    }
+}
+
+class MainArea extends AdventureScene {
+    constructor() {
+        super("MainArea", "Dark Room");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("darkRoomBg", "darkRoom.jpg");
+    }
+    create() {
+        super.create("darkRoomBg", 2.1);
+    }
+    onEnter() {
+        this.createDoorway("Jail Cells", 
+                            64, 
+                            490, 
+                            "Sounds pretty empty in there", 
+                            "JailCells");
+
+        this.createDoorway("Dark Hallway", 
+                            348, 
+                            350, 
+                            "Sounds pretty empty in there", 
+                            "StoneHallway");
+        
+        this.createDoorway("Armory", 
+                            1020, 
+                            405, 
+                            "Sounds pretty empty in there", 
+                            "Armory");
+        
+        this.createDoorway("Ominous Door", 
+                            660,
+                            413, 
+                            "Sounds pretty empty in there", 
+                            "BossRoom");
+        
+        // let finish = this.add.text(this.w * 0.6, this.w * 0.2, '(finish the game)')
+        //     .setInteractive()
+        //     .on('pointerover', () => {
+        //         this.showMessage('*giggles*');
+        //         this.tweens.add({
+        //             targets: finish,
+        //             x: this.s + (this.h - 2 * this.s) * Math.random(),
+        //             y: this.s + (this.h - 2 * this.s) * Math.random(),
+        //             ease: 'Sine.inOut',
+        //             duration: 500
+        //         });
+        //     })
+        //     .on('pointerdown', () => this.gotoScene('outro'));
+    }
+}
+
+class JailCells extends AdventureScene {
+    constructor() {
+        super("JailCells", "The Cells");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("jailsBg", "jails.jpg");
+    }
+    create() {
+        super.create("jailsBg", 2.1);
+    }
+    onEnter() {
+        this.createDoorway("Back to Dark Room", 
+                            512, 
+                            990, 
+                            "awowowow", 
+                            "MainArea");
+
+        
+    }
+}
+
+class StoneHallway extends AdventureScene {
+    constructor() {
+        super("StoneHallway", "Dark Hallway");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("stoneHallwayBg", "stoneHallway.jpg");
+    }
+    create() {
+        super.create("stoneHallwayBg", 2.1);
+    }
+    onEnter() {
+        this.createDoorway("Back to Dark Room", 
+                            512, 
+                            990, 
+                            "awowowow", 
+                            "MainArea");
+    }
+}
+
+class Armory extends AdventureScene {
+    constructor() {
+        super("Armory", "Empty Armory");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("armoryBg", "armory.jpg");
+    }
+    create() {
+        super.create("armoryBg", 2.1);
+    }
+    onEnter() {
+        this.createDoorway("Back to Dark Room", 
+                            512, 
+                            990, 
+                            "awowowow", 
+                            "MainArea");
+
+        let arrow = this.add.text(200, 640, "Broken Arrow")
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => this.showMessage("Broken in half."))
+            .on('pointerdown', () => {
+                this.showMessage("This is useless...");
+                this.tweens.add({
+                    targets: arrow,
+                    x: '+=' + this.s,
+                    repeat: 2,
+                    yoyo: true,
+                    ease: 'Sine.inOut',
+                    duration: 100
+                });
+            });
+        
+        if (!this.hasItem("Sol Beam")) {
+            this.spawnItem("Sol Beam", 
+                            1160, 
+                            415, 
+                            "A spell.", 
+                            "Cool");
+        }
 
     }
 }
 
-class Demo2 extends AdventureScene {
+class BossRoom extends AdventureScene {
     constructor() {
-        super("demo2", "The second room has a long name (it truly does).");
+        super("BossRoom", "Throne Room");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("throneRoomBg", "throneRoom.jpg");
+    }
+    create() {
+        super.create("throneRoomBg", 2.1);
     }
     onEnter() {
-        this.add.text(this.w * 0.3, this.w * 0.4, "just go back")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage("You've got no other choice, really.");
-            })
-            .on('pointerdown', () => {
-                this.gotoScene('demo1');
-            });
+        this.createDoorway("Back to Dark Room", 
+                            512, 
+                            990, 
+                            "awowowow", 
+                            "MainArea");
+    }
+}
 
-        let finish = this.add.text(this.w * 0.6, this.w * 0.2, '(finish the game)')
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage('*giggles*');
-                this.tweens.add({
-                    targets: finish,
-                    x: this.s + (this.h - 2 * this.s) * Math.random(),
-                    y: this.s + (this.h - 2 * this.s) * Math.random(),
-                    ease: 'Sine.inOut',
-                    duration: 500
-                });
-            })
-            .on('pointerdown', () => this.gotoScene('outro'));
+class GuardRoom extends AdventureScene {
+    constructor() {
+        super("GuardRoom", "Guard Room");
+    }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("guardRoomBg", "guardRoom.jpg");
+    }
+    create() {
+        super.create("guardRoomBg", 2.1);
+    }
+    onEnter() {
+        this.createDoorway("Back to Dark Room", 
+                            512, 
+                            990, 
+                            "awowowow", 
+                            "MainArea");
     }
 }
 
@@ -186,7 +328,8 @@ const game = new Phaser.Game({
         width: 1920,
         height: 1080
     },
-    scene: [Intro, HallwayToMainArea, Demo2, Outro],
+    scene: [Intro, HallwayToMainArea, MainArea, JailCells, StoneHallway, Armory, BossRoom, GuardRoom, Outro],
+    // scene: [MainArea],
     title: "Adventure Game",
 });
 
