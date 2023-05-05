@@ -1,9 +1,17 @@
-class Demo1 extends AdventureScene {
+class HallwayToMainArea extends AdventureScene {
     constructor() {
-        super("demo1", "First Room");
+        super("HallwayToMainArea", "Hallway");
     }
-
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("hallwayBg", "hallway.jpg");
+    }
+    create() {
+        super.create("hallwayBg", 2.1);
+    }
     onEnter() {
+        
+        // this.add.image(this.w / 2, this.h / 2, "hallwayBg").setScale(2.15);
 
         let clip = this.add.text(this.w * 0.3, this.w * 0.3, "📎 paperclip")
             .setFontSize(this.s * 2)
@@ -96,13 +104,22 @@ class Intro extends Phaser.Scene {
     constructor() {
         super('intro')
     }
+    preload() {
+        this.load.path = "./assets/";
+        this.load.image("introBg", "startingArea.jpg");
+    }
     create() {
+        this.w = this.game.config.width;
+        this.h = this.game.config.height;
+
+        this.add.image(this.w / 2, this.h / 2, "introBg").setScale(2.15);
         this.add.text(50,50, "Adventure awaits!").setFontSize(50);
         this.add.text(50,100, "Click anywhere to begin.").setFontSize(20);
         this.input.on('pointerdown', () => {
             this.cameras.main.fade(1000, 0,0,0);
-            this.time.delayedCall(1000, () => this.scene.start('demo1'));
+            this.time.delayedCall(1000, () => this.scene.start('HallwayToMainArea'));
         });
+        
     }
 }
 
@@ -125,7 +142,7 @@ const game = new Phaser.Game({
         width: 1920,
         height: 1080
     },
-    scene: [Intro, Demo1, Demo2, Outro],
+    scene: [Intro, HallwayToMainArea, Demo2, Outro],
     title: "Adventure Game",
 });
 

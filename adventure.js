@@ -9,12 +9,16 @@ class AdventureScene extends Phaser.Scene {
         this.name = name;
     }
 
-    create() {
+    create(backgroundImage, scale=2.15) {
         this.transitionDuration = 1000;
 
         this.w = this.game.config.width;
         this.h = this.game.config.height;
         this.s = this.game.config.width * 0.01;
+
+        if (backgroundImage) {    
+            this.add.image(this.w / 2 - this.w * 0.1, this.h / 2, backgroundImage).setScale(scale);
+        }
 
         this.cameras.main.setBackgroundColor('#444');
         this.cameras.main.fadeIn(this.transitionDuration, 0, 0, 0);
