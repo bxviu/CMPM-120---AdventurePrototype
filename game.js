@@ -10,59 +10,103 @@ class HallwayToMainArea extends AdventureScene {
         super.create("hallwayBg", 2.1);
     }
     onEnter() {
-        
-        // this.add.image(this.w / 2, this.h / 2, "hallwayBg").setScale(2.15);
+        this.gainItem('Simple Dagger');
+        this.showMessage("Where am I?");
+        // let clip = this.add.text(this.w * 0.3, this.w * 0.3, "📎 paperclip")
+        //     .setFontSize(this.s * 2)
+        //     .setInteractive()
+        //     .on('pointerover', () => this.showMessage("Metal, bent."))
+        //     .on('pointerdown', () => {
+        //         this.showMessage("No touching!");
+        //         this.tweens.add({
+        //             targets: clip,
+        //             x: '+=' + this.s,
+        //             repeat: 2,
+        //             yoyo: true,
+        //             ease: 'Sine.inOut',
+        //             duration: 100
+        //         });
+        //     });
 
-        let clip = this.add.text(this.w * 0.3, this.w * 0.3, "📎 paperclip")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => this.showMessage("Metal, bent."))
-            .on('pointerdown', () => {
-                this.showMessage("No touching!");
-                this.tweens.add({
-                    targets: clip,
-                    x: '+=' + this.s,
-                    repeat: 2,
-                    yoyo: true,
-                    ease: 'Sine.inOut',
-                    duration: 100
-                });
-            });
-
-        let key = this.add.text(this.w * 0.5, this.w * 0.1, "🔑 key")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage("It's a nice key.")
-            })
-            .on('pointerdown', () => {
-                this.showMessage("You pick up the key.");
-                this.gainItem('key');
-                this.tweens.add({
-                    targets: key,
-                    y: `-=${2 * this.s}`,
-                    alpha: { from: 1, to: 0 },
-                    duration: 500,
-                    onComplete: () => key.destroy()
-                });
-            })
-
-        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
+        let skeleton = this.add.text(1000, 667, "Skeleton")
             .setFontSize(this.s * 2)
             .setInteractive()
             .on('pointerover', () => {
-                if (this.hasItem("key")) {
-                    this.showMessage("You've got the key for this door.");
-                } else {
-                    this.showMessage("It's locked. Can you find a key?");
+                this.showMessage("Hmm this skeleton might have a key.");
+            })
+            .on('pointerdown', () => {
+                if (this.holdingItem("Simple Dagger")) {
+                    this.showMessage("I have defeated the skeleton. It dropped a \"skeleton key\"!");
+                    this.tweens.add({
+                        targets: skeleton,
+                        angle: `-=${2 * this.s}`,
+                        alpha: { from: 1, to: 0 },
+                        duration: 500,
+                        onComplete: () => {
+                            skeleton.destroy();
+                            this.time.delayedCall(1000, ()=>{
+                                this.spawnItem('Skeleton Key', 1000, 667, "I can probably use this key to open the door.", "I have \"skeleton key\" now.");
+                            });
+                        }
+                    });
+                }
+                else {
+                    this.showMessage("I'll need to select my \"Simple Dagger\" first and then click on the skeleton.");
+                    this.tweens.add({
+                        targets: skeleton,
+                        x: '+=' + this.s,
+                        repeat: 2,
+                        yoyo: true,
+                        ease: 'Sine.inOut',
+                        duration: 100
+                    });
                 }
             })
+
+        // let key = this.add.text(1000, 667, "Skeleton Key")
+        // .setFontSize(this.s * 2)
+        // .setInteractive()
+        // .on('pointerover', () => {
+        //     this.showMessage("I can probably use this key to open the door.")
+        // })
+        // .on('pointerdown', () => {
+        //     this.showMessage("I have \"skeleton key\" now.");
+        //     this.gainItem('key');
+        //     this.tweens.add({
+        //         targets: key,
+        //         y: `-=${2 * this.s}`,
+        //         alpha: { from: 1, to: 0 },
+        //         duration: 500,
+        //         onComplete: () => key.destroy()
+        //     });
+        // })
+
+        // this.time.delayedCall(1500, ()=>{
+        //     settings = "tip1";
+        //     this.scene.start('loading');
+        //     // go_to_scene(this,'loading','tip1')
+        // });
+
+        let door = this.add.text(520, 512, "🚪 locked door", {color:"#00FFF0",})
+            .setFontSize(this.s * 2)
+            .setInteractive()
+            .on('pointerover', () => {
+                if (this.hasItem("Skeleton Key")) {
+                    this.showMessage("I have the key for this door.");
+                } else {
+                    this.showMessage("It's locked. I need to find a key.");
+                }
+                // console.log(this.holdingItem("key"));
+            })
             .on('pointerdown', () => {
-                if (this.hasItem("key")) {
-                    this.loseItem("key");
+                if (this.holdingItem("Skeleton Key")) {
+                    this.loseItem("Skeleton Key");
                     this.showMessage("*squeak*");
-                    door.setText("🚪 unlocked door");
+                    door.setText("Unlocked Door");
                     this.gotoScene('demo2');
+                }
+                else {
+                    this.showMessage("Locked. I'll need to find a key.");
                 }
             })
 
