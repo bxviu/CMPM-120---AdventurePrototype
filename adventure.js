@@ -127,10 +127,7 @@ class AdventureScene extends Phaser.Scene {
     }
     
     returnItem(item) {
-        // let temp = this.heldItem;
         this.heldItem = null;   
-        // this.updateInventory();
-        // this.returnItem(temp);
         this.tweens.add({
             targets: item,
             angle: {from: -5, to: 5},
@@ -143,7 +140,6 @@ class AdventureScene extends Phaser.Scene {
                     y: {from: this.mousey,  to: h + item.height + this.s},
                     duration: 250,
                     onComplete: () => {
-                        // item.setInteractive();
                         this.updateInventory();
                     }
                 });
@@ -178,8 +174,8 @@ class AdventureScene extends Phaser.Scene {
         });
     }
 
-    createDoorway(text, x, y, overText, scene) {
-        this.add.text(x, y, text)
+    createDoorway(text, x, y, overText, scene, ending) {
+        let doorway = this.add.text(x, y, text)
             .setFontSize(this.s * 2)
             .setInteractive()
             .on('pointerover', () => {
@@ -188,6 +184,7 @@ class AdventureScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.gotoScene(scene);
             });
+        return doorway;
     }
 
     createEntity(text, x, y, txtColor="#00FFF0") {
