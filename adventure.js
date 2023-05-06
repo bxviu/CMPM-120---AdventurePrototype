@@ -2,6 +2,7 @@ class AdventureScene extends Phaser.Scene {
 
     init(data) {
         this.inventory = data.inventory || [];
+        this.interacted = data.interacted  || [];
         this.heldItem = null;
     }
 
@@ -10,7 +11,7 @@ class AdventureScene extends Phaser.Scene {
         this.name = name;
     }
 
-    create(backgroundImage, scale=2.15) {
+    create(backgroundImage, scale = 2.15, bgx = this.game.config.width / 2 - this.game.config.width * 0.1, bgy = this.game.config.height / 2) {
         this.transitionDuration = 1000;
 
         this.w = this.game.config.width;
@@ -18,7 +19,8 @@ class AdventureScene extends Phaser.Scene {
         this.s = this.game.config.width * 0.01;
 
         if (backgroundImage) {    
-            this.add.image(this.w / 2 - this.w * 0.1, this.h / 2, backgroundImage).setScale(scale);
+            console.log(bgx);
+            this.add.image(bgx, bgy, backgroundImage).setScale(scale);
         }
 
         this.cameras.main.setBackgroundColor('#444');
@@ -131,7 +133,7 @@ class AdventureScene extends Phaser.Scene {
         // this.returnItem(temp);
         this.tweens.add({
             targets: item,
-            angle: {from: -5, to: 0},
+            angle: {from: -5, to: 5},
             duration: 250,
             onComplete: () => {
                 let h = this.h * 0.66 + 3 * this.s;
@@ -191,7 +193,8 @@ class AdventureScene extends Phaser.Scene {
     createEntity(text, x, y, txtColor="#00FFF0") {
         let entity = this.add.text(x, y, text, {color:txtColor,})
             .setFontSize(this.s * 2)
-            .setInteractive();
+            .setInteractive()
+            .setWordWrapWidth(1).setAlign('center');
         return entity
     }
 
@@ -210,6 +213,10 @@ class AdventureScene extends Phaser.Scene {
             return false;
         }
         return this.heldItem.text == item;
+    }
+
+    hasInteracted(entity) {
+        return this.interacted.includes(entity);
     }
 
     hasItem(item) {
@@ -261,10 +268,10 @@ class AdventureScene extends Phaser.Scene {
         });
     }
 
-    gotoScene(key) {
-        this.cameras.main.fade(this.transitionDuration, 0, 0, 0);
-        this.time.delayedCall(this.transitionDuration, () => {
-            this.scene.start(key, { inventory: this.inventory });
+    gotoScene(key, transitionTime = this.transitionDuration) {
+        this.cameras.main.fade(transitionTime, 0, 0, 0);
+        this.time.delayedCall(transitionTime, () => {
+            this.scene.start(key, { inventory: this.inventory, interacted:this.interacted });
         });
     }
 
