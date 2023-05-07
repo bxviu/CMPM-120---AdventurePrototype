@@ -1,4 +1,6 @@
-A simple adventure game by Benthan Vu based on a simple adventure game engine by [Adam Smith](https://github.com/rndmcnlly).
+A simple adventure game by Benthan Vu based on a simple adventure game engine by [Adam Smith](https://github.com/rndmcnlly).  
+  
+### [Click here to see the game.](https://bxviu.github.io/CMPM-120---AdventurePrototype/)
 
 Code requirements:
 - **4+ scenes based on `AdventureScene`**: (name at least 4 of the classes)
@@ -44,7 +46,7 @@ Experience requirements:
     - You can click items in your inventory to hold them, and once you click again, the item will be used on whatever you clicked on and tweened back to the inventory. 
 
 Asset sources:
-- Every image was created using ai from https://runwayml.com/. The only changes I made was resizing it and placing it in the background.
+- Every image was created using ai from [Runway ML](https://runwayml.com/). The only changes I made was resizing it and placing it in the background.
 - Prompts:
     - Start Screen: dungeon area with an open doorway
     - Hallway: dungeon area with an open doorway
