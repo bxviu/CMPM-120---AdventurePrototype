@@ -10,15 +10,15 @@ class HallwayToMainArea extends AdventureScene {
         super.create("hallwayBg", 2.1);
     }
     onEnter() {
-        this.gainItem('Simple Dagger');
+        this.gainItem('🗡️ Simple Dagger');
         this.showMessage("Where is the treasure? I must find it.");
 
-        let skeleton = this.createEntity("Skeleton", 1000, 667);
+        let skeleton = this.createEntity("💀 Skeleton", 1000, 667);
         skeleton.on('pointerover', () => {
-                this.showMessage("Hmm this skeleton might have a key.");
+                this.showMessage("Hmm... this skeleton might have a key to that door.");
             })
             .on('pointerdown', () => {
-                if (this.holdingItem("Simple Dagger")) {
+                if (this.holdingItem("🗡️ Simple Dagger")) {
                     this.showMessage("I have defeated the skeleton. It dropped a \"skeleton key\"!");
                     this.tweens.add({
                         targets: skeleton,
@@ -28,7 +28,7 @@ class HallwayToMainArea extends AdventureScene {
                         onComplete: () => {
                             skeleton.destroy();
                             this.time.delayedCall(50, ()=>{
-                                this.spawnItem('Skeleton Key', 
+                                this.spawnItem('🔑 Skeleton Key', 
                                                 1000, 
                                                 667, 
                                                 "I can probably use this key to open the door.", 
@@ -38,7 +38,7 @@ class HallwayToMainArea extends AdventureScene {
                     });
                 }
                 else {
-                    this.showMessage("I'll need to select my \"Simple Dagger\" first and then click on the skeleton.");
+                    this.showMessage("I'll need to select my \"🗡️ Simple Dagger\" first and then click on the skeleton.");
                     this.tweens.add({
                         targets: skeleton,
                         x: '+=' + this.s,
@@ -50,17 +50,17 @@ class HallwayToMainArea extends AdventureScene {
                 }
             })
             
-        let door = this.createEntity("🚪 Locked Door", 520, 512);
+        let door = this.createEntity("🚪 Locked Door", 462, 497);
         door.on('pointerover', () => {
-                if (this.hasItem("Skeleton Key")) {
+                if (this.hasItem("🔑 Skeleton Key")) {
                     this.showMessage("I have the key for this door.");
                 } else {
                     this.showMessage("It's locked. I need to find a key.");
                 }
             })
             .on('pointerdown', () => {
-                if (this.holdingItem("Skeleton Key")) {
-                    this.loseItem("Skeleton Key");
+                if (this.holdingItem("🔑 Skeleton Key")) {
+                    this.loseItem("🔑 Skeleton Key");
                     this.showMessage("*squeak*");
                     door.setText("🚪 Unlocked Door");
                     this.gotoScene('MainArea');
@@ -85,10 +85,13 @@ class MainArea extends AdventureScene {
     }
     onEnter() {
         this.createDoorway("Leave", 
-                            512, 
+                            660, 
                             990, 
-                            this.hasItem("Loot") ? "Time to make a fortune selling this stuff!" : "Abandon my mission and run away.",  
-                            "summary");
+                            this.hasItem("⚱️⚜️👑 Loot") ? 
+                            "Time to make a fortune selling this stuff!" : 
+                            this.hasInteracted("giftedPerson") ? "Oh well, at least someone else is going to be rich..." : "Abandon my mission and run away.",  
+                            "summary",
+                            "#FFFFFF");
 
         this.createDoorway("Jail Cells", 
                             64, 
@@ -105,13 +108,13 @@ class MainArea extends AdventureScene {
         this.createDoorway("Armory", 
                             1020, 
                             405, 
-                            this.hasItem("Sol Beam") ? "That place has been ransacked." : "Maybe something useful is in here.", 
+                            this.hasItem("🪄 Sol Beam") ? "That place has been ransacked." : "Maybe something useful is in here.", 
                             "Armory");
         
         this.createDoorway("Ominous Door", 
                             660,
                             413, 
-                            this.hasInteracted("bossSeen") ? "I need help or a stronger weapon against that being." : "I feel an eerie presence behind this door.", 
+                            this.hasInteracted("bossDefeated") ? "That ominous feeling is gone." : this.hasInteracted("bossSeen") ? "I need help or a stronger weapon against that being." : "I feel an eerie presence behind this door.", 
                             "BossRoom");
 
     }
@@ -140,24 +143,24 @@ class JailCells extends AdventureScene {
             if (this.interacted[this.interacted.length - 1] == "leftCell") {
                 this.showMessage("Nothing is in there.");
             }
-            let leftCell = this.createEntity("Unlocked Cell", 50, 440);
+            let leftCell = this.createEntity("⛓️ Unlocked Cell", 50, 440);
             leftCell.on('pointerdown', () => {
                     this.showMessage("I can see a few plants sticking out of the walls.");
                 });
         }
         else {
-            let leftCell = this.createEntity("Cell", 97, 467);
+            let leftCell = this.createEntity("⛓️ Cell", 97, 467);
             leftCell.on('pointerover', () => {
-                    if (this.hasItem("Jail Key")) {
+                    if (this.hasItem("🔑 Jail Key")) {
                         this.showMessage("I can open this cell.");
                     } else {
                         this.showMessage("I don't have a key for these jail cells.");
                     }
                 })
                 .on('pointerdown', () => {
-                    if (this.holdingItem("Jail Key")) {
+                    if (this.holdingItem("🔑 Jail Key")) {
                         this.showMessage("*creak*");
-                        leftCell.setText("Unlocked Cell").setWordWrapWidth(1);
+                        leftCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                         this.interacted.push("leftCell");
                         this.gotoScene('JailCells', 0);
                     }
@@ -171,38 +174,93 @@ class JailCells extends AdventureScene {
             if (this.interacted[this.interacted.length - 1] == "middleCell") {
                 this.showMessage("\"Thanks for letting me out, I will follow you around now as a gesture of thanks!\"");
             }
-            let middleCell = this.createEntity("Unlocked Cell", 570, 463);
-            middleCell.on('pointerover', () => {
-                    if (!this.hasItem("Person's Aid")) {
-                        this.showMessage("The person in there looks at you thankfully.");
-                    }    
-                })
-                .on('pointerdown', () => {
-                    if (!this.hasItem("Person's Aid")) {
-                        this.showMessage("\"Thanks for letting me out, I will follow you around now as a gesture of thanks!");
-                        this.gainItem("Person's Aid");
-                        this.interacted.push("helpedPerson");
-                    }
-                    else {
-                        this.showMessage("There is nothing here.");
-                    }
+            let middleCell = this.createEntity("⛓️ Unlocked Cell", 575, 463);
+            middleCell.on('pointerdown', () => {
+                    this.showMessage("You comprehend nothing, just emptiness, as you try to observe what was in this cell.");
                 });
+            
+            if (!this.hasItem("🧍 Person's Aid") && !this.hasInteracted("destroyedPerson") && !this.hasInteracted("giftedPerson")) {
+                let person = this.createEntity("🧍 Person", 433, 667);
+                person.on('pointerover', () => {
+                        this.showMessage("The person looks at you gratefully. Maybe he can help you.");   
+                    })
+                    .on('pointerdown', () => {
+                        if (this.holdingItem("🗡️ Simple Dagger")) {
+                            this.showMessage("No thanks.");
+                            this.tweens.add({
+                                targets: person,
+                                x: '+=' + this.s,
+                                repeat: 2,
+                                yoyo: true,
+                                ease: 'Sine.inOut',
+                                duration: 100
+                            });
+                        }
+                        else if (this.holdingItem("🪄 Sol Beam")) {
+                            this.showMessage("AAAAAAAAAAAAAAAAAAAaaaaaaaaaaaa a a  a    a     a        a....");
+                            this.interacted.push("destroyedPerson");
+                            this.tweens.add({
+                                targets: person,
+                                y: `-=${2 * this.s}`,
+                                alpha: { from: 1, to: 0 },
+                                duration: 500,
+                                onComplete: () => person.destroy()
+                            });
+                        }
+                        else if (this.holdingItem("⚱️⚜️👑 Loot")) {
+                            this.showMessage("WOAH!! Now this is a nice gift! Thank you very much!!!! I shall take my leave now before you change your mind!");
+                            this.interacted.push("giftedPerson");
+                            this.loseItem("⚱️⚜️👑 Loot");
+                            this.tweens.add({
+                                targets: person,
+                                y: `-=${2 * this.s}`,
+                                alpha: { from: 1, to: 0 },
+                                duration: 500,
+                                onComplete: () => person.destroy()
+                            });
+                        }
+                        else if (this.holdingItem("any")) {
+                            this.showMessage("A gift? For me? Sorry, I don't need that.");
+                            this.tweens.add({
+                                targets: person,
+                                x: '+=' + this.s,
+                                repeat: 2,
+                                yoyo: true,
+                                ease: 'Sine.inOut',
+                                duration: 100
+                            });
+                        }
+                        else if (!this.hasItem("🧍 Person's Aid") && this.holdingItem(null)) {
+                            this.showMessage("\"Thanks for letting me out, I will follow you around now as a gesture of thanks!");
+                            this.gainItem("🧍 Person's Aid");
+                            this.interacted.push("acceptedPerson");
+                            this.tweens.add({
+                                targets: person,
+                                y: `-=${2 * this.s}`,
+                                alpha: { from: 1, to: 0 },
+                                duration: 500,
+                                onComplete: () => person.destroy()
+                            });
+                        }
+                    });
+            }
         }
         else {
-            let middleCell = this.createEntity("Cell", 570, 463);
+            let middleCell = this.createEntity("⛓️ Cell", 635, 463);
             middleCell.on('pointerover', () => {
                     this.interacted.push("personSeen");
-                    if (this.hasItem("Jail Key")) {
+                    if (this.hasItem("🔑 Jail Key")) {
                         this.showMessage("I can let this person out with my key!");
                     } else {
                         this.showMessage("why is person still in here, did they get left behind?");
                     }
                 })
                 .on('pointerdown', () => {
-                    if (this.holdingItem("Jail Key")) {
+                    if (this.holdingItem("🔑 Jail Key")) {
                         this.showMessage("*creak*");
-                        middleCell.setText("Unlocked Cell").setWordWrapWidth(1);
+                        middleCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                         this.interacted.push("middleCell");
+                        this.interacted.push("helpedPerson");
                         this.gotoScene('JailCells', 0);
                     }
                     else {
@@ -216,12 +274,12 @@ class JailCells extends AdventureScene {
             if (this.interacted[this.interacted.length - 1] == "rightCell") {
                 this.showMessage("A bat has flown out of the cell!");
             }
-            let rightCell = this.createEntity("Unlocked Cell", 1202, 507);
+            let rightCell = this.createEntity("⛓️ Unlocked Cell", 1152, 507);
             rightCell.on('pointerdown', () => {
                     this.showMessage("There is nothing here.");
                 });
 
-            let bat = this.createEntity("Bat", 861, 131);
+            let bat = this.createEntity("🦇 Bat", 861, 131);
             bat.on('pointerover', () => {
                     this.showMessage('*flaps*');
                     this.tweens.add({
@@ -234,18 +292,18 @@ class JailCells extends AdventureScene {
                 });
         }
         else {
-            let rightCell = this.createEntity("Cell", 1202, 507);
+            let rightCell = this.createEntity("⛓️ Cell", 1202, 507);
             rightCell.on('pointerover', () => {
-                if (this.hasItem("Jail Key")) {
+                if (this.hasItem("🔑 Jail Key")) {
                     this.showMessage("I can open this cell.");
                 } else {
                     this.showMessage("I don't have a key for these jail cells.");
                 }
             })
             .on('pointerdown', () => {
-                if (this.holdingItem("Jail Key")) {
+                if (this.holdingItem("🔑 Jail Key")) {
                     this.showMessage("*creak*");
-                    rightCell.setText("Unlocked Cell").setWordWrapWidth(1);
+                    rightCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                     this.interacted.push("rightCell");
                     this.gotoScene('JailCells', 0);
                 }
@@ -276,12 +334,12 @@ class StoneHallway extends AdventureScene {
                             "MainArea");
 
     if (!this.hasInteracted("zombie")) {
-        let zombie = this.createEntity("Zombie Guard", 211, 647);
+        let zombie = this.createEntity("🧟 Zombie Guard", 211, 647);
         zombie.on('pointerover', () => {
                 this.showMessage("Slow and wandering aimlessly.");
             })
             .on('pointerdown', () => {
-                if (this.holdingItem("Simple Dagger") || this.holdingItem("Sol Beam")) {
+                if (this.holdingItem("🗡️ Simple Dagger") || this.holdingItem("🪄 Sol Beam")) {
                     this.showMessage("I have defeated the zombie guard. It dropped a key!");
                     this.interacted.push("zombie");
                     this.tweens.add({
@@ -292,7 +350,7 @@ class StoneHallway extends AdventureScene {
                         onComplete: () => {
                             zombie.destroy();
                             this.time.delayedCall(50, ()=>{
-                                this.spawnItem('Guard Room Key', 
+                                this.spawnItem('🔑 Guard Room Key', 
                                                 211, 
                                                 647, 
                                                 "I can probably use this key to open the guard room.", 
@@ -313,6 +371,22 @@ class StoneHallway extends AdventureScene {
                     });
                 }
             })
+            this.tweens.add({
+                targets: zombie,
+                x: this.s + (this.h - 5 * this.s) * Math.random(),
+                y: this.s + (this.h - 2 * this.s) * Math.random(),
+                repeat: -1,
+                yoyo: true,
+                ease: 'Sine.inOut',
+                duration: 10000
+            });
+        }
+        else if (this.hasInteracted("zombie") && !this.hasItem("🔑 Guard Room Key")) {
+            this.spawnItem('🔑 Guard Room Key', 
+                            211, 
+                            647, 
+                            "I can probably use this key to open the guard room.", 
+                            "I can open the guard room with this.");
         }
 
         if (this.hasInteracted("guardDoor")) {
@@ -328,16 +402,16 @@ class StoneHallway extends AdventureScene {
                 });
         }
         else {
-            let guardRoom = this.createEntity("Locked Door", 716, 594);
+            let guardRoom = this.createEntity("🚪 Locked Door", 716, 594);
             guardRoom.on('pointerover', () => {
-                if (this.hasItem("Guard Room Key")) {
+                if (this.hasItem("🔑 Guard Room Key")) {
                     this.showMessage("I have a key for this door.");
                 } else {
                     this.showMessage("I don't have a key for this.");
                 }
             })
             .on('pointerdown', () => {
-                if (this.holdingItem("Guard Room Key")) {
+                if (this.holdingItem("🔑 Guard Room Key")) {
                     // this.loseItem("Guard Room Key");
                     this.showMessage("*rumbles*");
                     guardRoom.setText("Guard Room").setWordWrapWidth(1);
@@ -369,11 +443,8 @@ class Armory extends AdventureScene {
                             990, 
                             "", 
                             "MainArea");
-
-        let arrow = this.add.text(200, 640, "Broken Arrow")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => this.showMessage("Broken in half."))
+        let arrow = this.createEntity("🏹 Broken Arrow", 200, 640);
+        arrow.on('pointerover', () => this.showMessage("Broken in half."))
             .on('pointerdown', () => {
                 this.showMessage("This is useless...");
                 this.tweens.add({
@@ -386,12 +457,15 @@ class Armory extends AdventureScene {
                 });
             });
         
-        if (!this.hasItem("Sol Beam")) {
-            this.spawnItem("Sol Beam", 
+        if (!this.hasItem("🪄 Sol Beam")) {
+            let wand = this.spawnItem("🪄 Sol Beam", 
                             1160, 
                             415, 
                             "A wand with a note next to it. It says \"Sol Beam\"", 
                             "Cool, this is way stronger than my dagger.");
+            wand.on('pointerdown', () => {
+                this.interacted.push("gotSolBeam");
+            });
         }
 
     }
@@ -415,58 +489,69 @@ class BossRoom extends AdventureScene {
                             "", 
                             "MainArea");
 
-        let boss = this.createEntity("Apuloxizelth", 670, 657);
-        boss.on('pointerover', () => {
-                this.showMessage("Wow, no way I can beat this entity with my simple dagger.");
-                this.interacted.push("bossSeen");
-            })
-            .on('pointerdown', () => {
-                if (this.holdingItem("Person's Aid") || this.holdingItem("Sol Beam")) {
-                    if (this.holdingItem ("Person's Aid")) {
-                        this.interacted.push("usedPersonAid");
-                    } 
+        if (!this.hasInteracted("bossDefeated")) {
+            let boss = this.createEntity(" ↼⚟❪◯❫⚞⇀ Apuloxizelth", 670, 657, "#FF0000");
+            boss.on('pointerover', () => {
+                    this.showMessage("Wow, no way I can beat this entity with my simple dagger.");
+                    this.interacted.push("bossSeen");
+                })
+                .on('pointerdown', () => {
+                    if (this.holdingItem("🧍 Person's Aid") || this.holdingItem("🪄 Sol Beam")) {
+                        if (this.holdingItem ("🧍 Person's Aid")) {
+                            this.interacted.push("usedPersonAid");
+                        } 
+                        else {
+                            this.interacted.push("usedSolBeam");
+                        } 
+                        this.showMessage("Apuloxizelth has been defeated!!! Where's my loot?!");
+                        this.interacted.push("bossDefeated");
+                        this.tweens.add({
+                            targets: boss,
+                            angle: `-=${2 * this.s}`,
+                            alpha: { from: 1, to: 0 },
+                            duration: 500,
+                            onComplete: () => {
+                                boss.destroy();
+                                this.time.delayedCall(50, ()=>{
+                                    this.spawnItem('⚱️⚜️👑 Loot', 
+                                                    670, 
+                                                    657, 
+                                                    "Money is in my sight!", 
+                                                    "Oh boy time to be rich!");
+                                });
+                            }
+                        });
+                    }
+                    else if (this.holdingItem("🗡️ Simple Dagger")) {
+                        door.destroy();
+                        this.inventory = [];
+                        this.updateInventory();
+                        this.showMessage("Apuloxizelth easily disarms you and stabs you in the back with your own dagger...");
+                        this.interacted.push("killedByBoss");
+                        this.time.delayedCall(4000, ()=>{
+                            this.gotoScene('summary');
+                        });
+                    }
                     else {
-                        this.interacted.push("usedSolBeam");
-                    } 
-                    this.showMessage("Apuloxizelth has been defeated!!! Where's my loot?!");
-                    this.interacted.push("bossDefeated");
-                    this.tweens.add({
-                        targets: boss,
-                        angle: `-=${2 * this.s}`,
-                        alpha: { from: 1, to: 0 },
-                        duration: 500,
-                        onComplete: () => {
-                            boss.destroy();
-                            this.time.delayedCall(50, ()=>{
-                                this.spawnItem('Loot', 
-                                                670, 
-                                                657, 
-                                                "Money is in my sight!", 
-                                                "Oh boy time to be rich!");
-                            });
-                        }
-                    });
-                }
-                else if (this.holdingItem("Simple Dagger")) {
-                    door.destroy();
-                    this.showMessage("Apuloxizelth easily disarms you and stabs you in the back with your own dagger...");
-                    this.interacted.push("killedByBoss");
-                    this.time.delayedCall(4000, ()=>{
-                        this.gotoScene('summary');
-                    });
-                }
-                else {
-                    this.showMessage("I am not going to fight that eldritch horror with my bare hands.");
-                    this.tweens.add({
-                        targets: boss,
-                        x: '+=' + this.s,
-                        repeat: 2,
-                        yoyo: true,
-                        ease: 'Sine.inOut',
-                        duration: 100
-                    });
-                }
-            })
+                        this.showMessage("I am not going to fight that eldritch horror with my bare hands.");
+                        this.tweens.add({
+                            targets: boss,
+                            x: '+=' + this.s,
+                            repeat: 2,
+                            yoyo: true,
+                            ease: 'Sine.inOut',
+                            duration: 100
+                        });
+                    }
+                })
+        }
+        else {
+            this.spawnItem('⚱️⚜️👑 Loot', 
+                            670, 
+                            657, 
+                            "Money is in my sight!", 
+                            "Oh boy time to be rich!");
+        }
         
     }
 }
@@ -489,18 +574,16 @@ class GuardRoom extends AdventureScene {
                             "", 
                             "StoneHallway");
 
-        if (!this.hasItem("Jail Key")) {
-            this.spawnItem("Jail Key", 
+        if (!this.hasItem("🔑 Jail Key")) {
+            this.spawnItem("🔑 Jail Key", 
                             164, 
                             714, 
                             "I might be able to use this key on some other places.", 
                             "*jingling noise*");
         }
 
-        let rustedKey = this.add.text(1117, 754, "Rusted Key")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => this.showMessage("Rusted beyond usage."))
+        let rustedKey = this.createEntity("🔑 Rusted Key", 1117, 754);
+        rustedKey.on('pointerover', () => this.showMessage("Rusted beyond usage."))
             .on('pointerdown', () => {
                 this.showMessage("In this state, nothing can be opened with this.");
                 this.tweens.add({
@@ -528,8 +611,8 @@ class Intro extends Phaser.Scene {
         this.h = this.game.config.height;
 
         this.add.image(this.w / 2, this.h / 2, "introBg").setScale(2.15);
-        this.add.text(this.w / 2 - 700, this.h / 2 - 500, "Dungeon Looter").setFontSize(150);
-        this.add.text(this.w / 2 - 800, this.h / 2 - 300, "Click anywhere to enter the dungeon.").setFontSize(75);
+        this.add.text(this.w / 2 - 700, this.h / 2 - 500, "Dungeon Looter", {color:"#FFFF00",}).setFontSize(150).preFX.addGlow("#000000");
+        this.add.text(this.w / 2 - 800, this.h / 2 - 300, "Click anywhere to enter the dungeon.", {color:"#00FA93",}).setFontSize(75).preFX.addGlow("#000000");;
         this.input.on('pointerdown', () => {
             this.cameras.main.fade(1000, 0,0,0);
             this.time.delayedCall(1000, () => this.scene.start('HallwayToMainArea'));
@@ -544,17 +627,29 @@ class Summary extends AdventureScene {
         super('summary');
     }
     create() {
-        let summaryText = this.add.text(this.w / 2, this.h / 2, "Summary").setFontSize(100);
-        this.time.delayedCall(1000, () => summaryText.destroy());
-        // let events = []
         if (this.hasInteracted("helpedPerson")) {
-            playerEvents.push("You helped free the person from the abandoned jail.");
+            playerEvents.push("After seeing a person stuck in the abandoned jail cell, you decided to help them out of there.");
         }
         if (!this.hasInteracted("helpedPerson") && this.hasInteracted("personSeen")) {
             playerEvents.push("You saw a person in a jail cell, but didn't help them out...");
         } 
-        if (this.hasInteracted("killedByBoss")) {
-            playerEvents.push("You were defeated by Apuloxizelth.");
+        if (this.hasInteracted("destroyedPerson")) {
+            playerEvents.push("You absolutely decimated the person from the abandoned jail with an accidental wave of your Sol Beam. Woopsies!");
+        }
+        if (this.hasInteracted("acceptedPerson")) {
+            playerEvents.push("You graciously allowed the person to join you on your dungeon raid.");
+        }
+        if (this.hasInteracted("killedByBoss") && this.hasInteracted("acceptedPerson")) {
+            playerEvents.push("The person from the jail watches in confusion as you run at the unholy being with a simple dagger, and consequently get destroyed. Maybe they could've helped you???");
+        } 
+        if (this.hasInteracted("killedByBoss") && this.hasInteracted("gotSolBeam")) {
+            playerEvents.push("You tried attacking the dungeon lord with a dagger when you had the option of using a spell thousands of times stronger than it.");
+        } 
+        if (this.hasInteracted("killedByBoss") && !(this.hasInteracted("gotSolBeam") || this.hasInteracted("acceptedPerson"))) {
+            playerEvents.push("You were defeated by Apuloxizelth. Maybe you shouldn't attack a being of unfathomable power with a dagger.");
+        }
+        else if (this.hasInteracted("killedByBoss")) {
+            playerEvents.push("Maybe you shouldn't use the starter weapon next time...");
         }
         if (this.hasInteracted("bossDefeated")) {
             if (this.hasInteracted("usedPersonAid")) {
@@ -564,21 +659,24 @@ class Summary extends AdventureScene {
                 playerEvents.push("Using your newly acquired Sol Beam, you plasmify Apuloxizelth into oblivion.");
             }
         }
-        if (this.hasItem("Loot")) {
+        if (this.hasItem("⚱️⚜️👑 Loot")) {
             playerEvents.push("After you defeated Apuloxizelth, you succesfully got the loot. Time to be rich!");
         }
-        else if (this.hasInteracted("bossDefeated") && !this.hasItem("Loot")) {
+        else if (this.hasInteracted("bossDefeated") && !this.hasItem("⚱️⚜️👑 Loot") && !this.hasInteracted("giftedPerson")) {
             playerEvents.push("You defeated Apuloxizelth but didn't get the loot. Why?!?!");
         }
         else if (!this.hasInteracted("killedByBoss") && !this.hasInteracted("bossDefeated")) {
             playerEvents.push("You ran away from the dungeon. Sadly, no loot resulted from that.");
         }
-        // playerEvents.push("You helped frerthe abandoned jail.");
-        // playerEvents.push("You helped free thehe abandoned jail.");
+        if (this.hasInteracted("giftedPerson")) {
+            playerEvents.push("You graciously give the random person you saved from the jail all of your loot. Good?");
+        }
+        // playerEvents.push("text summaryy number 1 placeholder text blah blha aifhawkhakfjmawjyfjmafja.");
+        // playerEvents.push("lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip");
 
-        // if (playerEvents.length == 0) {
-        //     playerEvents.push("You left immediately after going through the first door. At least you avoided any possible danger...");
-        // }
+        if (playerEvents.length < 3 && this.hasInteracted("bossDefeated")) {
+            playerEvents.push("You really rushed through the dungeon... Nice Job!");
+        }
         this.gotoScene('outro', 0);
     }
 }
@@ -591,7 +689,7 @@ class Outro extends Phaser.Scene {
         this.w = this.game.config.width;
         this.h = this.game.config.height;
         
-        let summaryText = this.add.text(this.w / 2 - 400, this.h / 2 - 200, "Summary").setFontSize(200);
+        let summaryText = this.add.text(this.w / 2 - 400, this.h / 2 - 200, "Summary", {color:"#00FA93",}).setFontSize(200);
         this.tweens.add({
             targets: summaryText,
             alpha: {from:0, to:1},
@@ -614,7 +712,6 @@ class Outro extends Phaser.Scene {
             });
         });
 
-        let eventsText = this.add.text(this.w / 2 - 300, this.h / 2 - 100, "").setFontSize(50).setWordWrapWidth(700);
         let eventList = [];
         for (let i = 0; i < playerEvents.length; i++) {
             let text = this.add.text(this.w / 2 - 300, this.h + 1000, playerEvents[i])
@@ -654,6 +751,8 @@ class Outro extends Phaser.Scene {
             ease:"Cubic.easeOut",
         });
         
+        playerEvents = []
+
         this.time.delayedCall((playerEvents.length+1)*4000 + 1000, () => {
             this.input.on('pointerdown', () => this.scene.start('intro'));
         });

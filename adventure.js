@@ -19,7 +19,6 @@ class AdventureScene extends Phaser.Scene {
         this.s = this.game.config.width * 0.01;
 
         if (backgroundImage) {    
-            console.log(bgx);
             this.add.image(bgx, bgy, backgroundImage).setScale(scale);
         }
 
@@ -121,18 +120,19 @@ class AdventureScene extends Phaser.Scene {
                 .setWordWrapWidth(this.w * 0.75 + 4 * this.s)
                 .setInteractive();
             text.on('pointerdown', (event) => {if (this.heldItem == null) {this.itemGrabbed(text)}})
+            text.preFX.addGlow("#000000");
             h += text.height + this.s;
             this.inventoryTexts.push(text);
         });
     }
     
     returnItem(item) {
-        this.heldItem = null;   
+        this.heldItem = null;  
         this.tweens.add({
             targets: item,
             angle: {from: -5, to: 5},
             duration: 250,
-            onComplete: () => {
+            onComplete: () => { 
                 let h = this.h * 0.66 + 3 * this.s;
                 this.tweens.add({
                     targets: item,
@@ -147,8 +147,9 @@ class AdventureScene extends Phaser.Scene {
         });
     }
 
-    spawnItem(itemName, x, y, pointerOverText, pointerDownText) {
-        let item = this.add.text(x, y, itemName).setFontSize(this.s * 2);
+    spawnItem(itemName, x, y, pointerOverText, pointerDownText, txtColor="#FFFF00") {
+        let item = this.add.text(x, y, itemName, {color:txtColor,}).setFontSize(this.s * 2);
+        item.preFX.addGlow("#FF0000");
         this.tweens.add({
             targets: item,
             y: `+=${2 * this.s}`,
@@ -172,10 +173,11 @@ class AdventureScene extends Phaser.Scene {
                     })
             }
         });
+        return item;
     }
 
-    createDoorway(text, x, y, overText, scene, ending) {
-        let doorway = this.add.text(x, y, text)
+    createDoorway(text, x, y, overText, scene, txtColor="#FFA500") {
+        let doorway = this.add.text(x, y, text, {color:txtColor,})
             .setFontSize(this.s * 2)
             .setInteractive()
             .on('pointerover', () => {
@@ -184,14 +186,16 @@ class AdventureScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.gotoScene(scene);
             });
+        doorway.preFX.addGlow("#FF0000");
         return doorway;
     }
 
-    createEntity(text, x, y, txtColor="#00FFF0") {
+    createEntity(text, x, y, txtColor="#90ee90") {
         let entity = this.add.text(x, y, text, {color:txtColor,})
             .setFontSize(this.s * 2)
             .setInteractive()
             .setWordWrapWidth(1).setAlign('center');
+        entity.preFX.addGlow("#FF0000");
         return entity
     }
 
@@ -199,17 +203,17 @@ class AdventureScene extends Phaser.Scene {
         if (this.heldItem != null) {
             this.returnItem(this.heldItem);
         }
-        console.log("holding " + item.text);
+        // console.log("holding " + item.text);
         this.heldItem = item;
         item.disableInteractive();
         this.input.setDefaultCursor('none');
     }
 
     holdingItem(item) { 
-        if (this.heldItem == null) {
-            return false;
-        }
-        return this.heldItem.text == item;
+        return item == "any" ? 
+                this.heldItem != null : item == null ? 
+                    true : this.heldItem == null ? 
+                        false : this.heldItem.text == item;
     }
 
     hasInteracted(entity) {
@@ -268,6 +272,8 @@ class AdventureScene extends Phaser.Scene {
     gotoScene(key, transitionTime = this.transitionDuration) {
         this.cameras.main.fade(transitionTime, 0, 0, 0);
         this.time.delayedCall(transitionTime, () => {
+            console.log(this.children.list);
+            this.children.list.forEach(x => x.destroy());
             this.scene.start(key, { inventory: this.inventory, interacted:this.interacted });
         });
     }
