@@ -3,6 +3,7 @@ class HallwayToMainArea extends AdventureScene {
         super("HallwayToMainArea", "Hallway");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("hallwayBg", "hallway.jpg");
     }
@@ -14,8 +15,9 @@ class HallwayToMainArea extends AdventureScene {
         this.showMessage("Where is the treasure? I must find it.");
 
         let skeleton = this.createEntity("💀 Skeleton", 1000, 667);
-        skeleton.on('pointerover', () => {
+        skeleton.list[1].on('pointerover', () => {
                 this.showMessage("Hmm... this skeleton might have a key to that door.");
+                this.checkVisual(skeleton.list[1]);
             })
             .on('pointerdown', () => {
                 if (this.holdingItem("🗡️ Simple Dagger")) {
@@ -51,7 +53,8 @@ class HallwayToMainArea extends AdventureScene {
             })
             
         let door = this.createEntity("🚪 Locked Door", 462, 497);
-        door.on('pointerover', () => {
+        door.list[1].on('pointerover', () => {
+                this.checkVisual(door.list[1]);
                 if (this.hasItem("🔑 Skeleton Key")) {
                     this.showMessage("I have the key for this door.");
                 } else {
@@ -62,7 +65,7 @@ class HallwayToMainArea extends AdventureScene {
                 if (this.holdingItem("🔑 Skeleton Key")) {
                     this.loseItem("🔑 Skeleton Key");
                     this.showMessage("*squeak*");
-                    door.setText("🚪 Unlocked Door");
+                    door.list[0].setText("🚪 Unlocked Door");
                     this.gotoScene('MainArea');
                 }
                 else {
@@ -77,6 +80,7 @@ class MainArea extends AdventureScene {
         super("MainArea", "Dark Room");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("darkRoomBg", "darkRoom.jpg");
     }
@@ -84,14 +88,41 @@ class MainArea extends AdventureScene {
         super.create("darkRoomBg", 2.1);
     }
     onEnter() {
-        this.createDoorway("Leave", 
-                            660, 
-                            990, 
-                            this.hasItem("⚱️⚜️👑 Loot") ? 
-                            "Time to make a fortune selling this stuff!" : 
-                            this.hasInteracted("giftedPerson") ? "Oh well, at least someone else is going to be rich..." : "Abandon my mission and run away.",  
-                            "summary",
-                            "#FFFFFF");
+        let leaveConfirmation = 0;
+
+        let leave = this.createEntity("Leave", 660, 990, "#FFFFFF");
+        leave.list[1].on('pointerover', () => {
+            if (this.hasItem("⚱️⚜️👑 Loot")) {
+                this.showMessage("Time to make a fortune selling this stuff!");
+            }
+            else if (this.hasInteracted("giftedPerson")) {
+                this.showMessage("Oh well, at least someone else is going to be rich...");
+            }
+            else {
+                this.showMessage("Abandon my mission and run away.");
+            }
+        })
+        .on('pointerdown', () => {
+            console.log(leaveConfirmation);
+            if (leaveConfirmation == 0) {
+                this.showMessage("Are you sure you want to leave?");
+            }
+            else {
+                this.gotoScene("summary");
+            }
+        })
+        .on('pointerup', () => {
+            leaveConfirmation = 1;
+        });
+        
+        // this.createDoorway("Leave", 
+        //                     660, 
+        //                     990, 
+        //                     this.hasItem("⚱️⚜️👑 Loot") ? 
+        //                     "Time to make a fortune selling this stuff!" : 
+        //                     this.hasInteracted("giftedPerson") ? "Oh well, at least someone else is going to be rich..." : "Abandon my mission and run away.",  
+        //                     "summary",
+        //                     "#FFFFFF");
 
         this.createDoorway("Jail Cells", 
                             64, 
@@ -106,7 +137,7 @@ class MainArea extends AdventureScene {
                             "StoneHallway");
         
         this.createDoorway("Armory", 
-                            1020, 
+                            1040, 
                             405, 
                             this.hasItem("🪄 Sol Beam") ? "That place has been ransacked." : "Maybe something useful is in here.", 
                             "Armory");
@@ -125,6 +156,7 @@ class JailCells extends AdventureScene {
         super("JailCells", "The Cells");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("jailsBg", "jails.jpg");
     }
@@ -132,6 +164,7 @@ class JailCells extends AdventureScene {
         super.create("jailsBg", 2.1, this.game.config.width / 2 - this.game.config.width * 0.05);
     }
     onEnter() {
+        let hastalked = false;
         // this.gainItem("Jail Key");
         this.createDoorway("Back to Dark Room", 
                             512, 
@@ -144,13 +177,17 @@ class JailCells extends AdventureScene {
                 this.showMessage("Nothing is in there.");
             }
             let leftCell = this.createEntity("⛓️ Unlocked Cell", 50, 440);
-            leftCell.on('pointerdown', () => {
+            leftCell.list[1].on('pointerover', () => {
+                    this.checkVisual(leftCell.list[1]);
+                })
+                .on('pointerdown', () => {
                     this.showMessage("I can see a few plants sticking out of the walls.");
                 });
         }
         else {
             let leftCell = this.createEntity("⛓️ Cell", 97, 467);
-            leftCell.on('pointerover', () => {
+            leftCell.list[1].on('pointerover', () => {
+                    this.checkVisual(leftCell.list[1]);
                     if (this.hasItem("🔑 Jail Key")) {
                         this.showMessage("I can open this cell.");
                     } else {
@@ -160,7 +197,7 @@ class JailCells extends AdventureScene {
                 .on('pointerdown', () => {
                     if (this.holdingItem("🔑 Jail Key")) {
                         this.showMessage("*creak*");
-                        leftCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
+                        leftCell.list[0].setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                         this.interacted.push("leftCell");
                         this.gotoScene('JailCells', 0);
                     }
@@ -175,17 +212,30 @@ class JailCells extends AdventureScene {
                 this.showMessage("\"Thanks for letting me out, I will follow you around now as a gesture of thanks!\"");
             }
             let middleCell = this.createEntity("⛓️ Unlocked Cell", 575, 463);
-            middleCell.on('pointerdown', () => {
+            middleCell.list[1].on('pointerover', () => {
+                    this.checkVisual(middleCell.list[1]);
+                })
+                .on('pointerdown', () => {
                     this.showMessage("You comprehend nothing, just emptiness, as you try to observe what was in this cell.");
                 });
             
             if (!this.hasItem("🧍 Person's Aid") && !this.hasInteracted("destroyedPerson") && !this.hasInteracted("giftedPerson")) {
                 let person = this.createEntity("🧍 Person", 433, 667);
-                person.on('pointerover', () => {
-                        this.showMessage("The person looks at you gratefully. Maybe he can help you.");   
+                person.list[1].on('pointerover', () => {
+                        this.checkVisual(person.list[1]);
+                        if (!hastalked) {
+                            this.showMessage("The person looks at you gratefully. Maybe he can help you.");   
+                        }
+                        else {
+                            this.showMessage("You can try giving this guy some item. Or click him again to have him join you."); 
+                        }
                     })
                     .on('pointerdown', () => {
-                        if (this.holdingItem("🗡️ Simple Dagger")) {
+                        if (!hastalked) {
+                            this.showMessage("\"Hello, do you have any items for me? If not, click on me again and I will join you on your mission. ");
+                            hastalked = true;
+                        }
+                        else if (this.holdingItem("🗡️ Simple Dagger")) {
                             this.showMessage("No thanks.");
                             this.tweens.add({
                                 targets: person,
@@ -219,6 +269,11 @@ class JailCells extends AdventureScene {
                                 onComplete: () => person.destroy()
                             });
                         }
+                        else if (this.holdingItem("🥩 Bat Meat")) {
+                            this.showMessage("Wow, protein!!!!! Omnomnomonononomononom");
+                            this.interacted.push("gavePersonFood");
+                            this.loseItem("🥩 Bat Meat");
+                        }
                         else if (this.holdingItem("any")) {
                             this.showMessage("A gift? For me? Sorry, I don't need that.");
                             this.tweens.add({
@@ -230,7 +285,7 @@ class JailCells extends AdventureScene {
                                 duration: 100
                             });
                         }
-                        else if (!this.hasItem("🧍 Person's Aid") && this.holdingItem(null)) {
+                        else if (!this.hasItem("🧍 Person's Aid") && this.holdingItem(null) && hastalked) {
                             this.showMessage("\"Thanks for letting me out, I will follow you around now as a gesture of thanks!");
                             this.gainItem("🧍 Person's Aid");
                             this.interacted.push("acceptedPerson");
@@ -247,8 +302,9 @@ class JailCells extends AdventureScene {
         }
         else {
             let middleCell = this.createEntity("⛓️ Cell", 635, 463);
-            middleCell.on('pointerover', () => {
+            middleCell.list[1].on('pointerover', () => {
                     this.interacted.push("personSeen");
+                    this.checkVisual(middleCell.list[1]);
                     if (this.hasItem("🔑 Jail Key")) {
                         this.showMessage("I can let this person out with my key!");
                     } else {
@@ -258,7 +314,7 @@ class JailCells extends AdventureScene {
                 .on('pointerdown', () => {
                     if (this.holdingItem("🔑 Jail Key")) {
                         this.showMessage("*creak*");
-                        middleCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
+                        middleCell.list[0].setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                         this.interacted.push("middleCell");
                         this.interacted.push("helpedPerson");
                         this.gotoScene('JailCells', 0);
@@ -275,25 +331,53 @@ class JailCells extends AdventureScene {
                 this.showMessage("A bat has flown out of the cell!");
             }
             let rightCell = this.createEntity("⛓️ Unlocked Cell", 1152, 507);
-            rightCell.on('pointerdown', () => {
+            rightCell.list[1].on('pointerover', () => {
+                    this.checkVisual(rightCell.list[1]);
+                })
+                .on('pointerdown', () => {
                     this.showMessage("There is nothing here.");
                 });
 
-            let bat = this.createEntity("🦇 Bat", 861, 131);
-            bat.on('pointerover', () => {
-                    this.showMessage('*flaps*');
-                    this.tweens.add({
-                        targets: bat,
-                        x: this.s + (this.h - 2 * this.s) * Math.random(),
-                        y: this.s + (this.h - 2 * this.s) * Math.random(),
-                        ease: 'Sine.inOut',
-                        duration: 500
+            if (!this.hasInteracted("batKilled")) {
+                let bat = this.createEntity("🦇 Bat", 861, 131);
+                bat.list[1].on('pointerover', () => {
+                        this.checkVisual(bat.list[1]);
+                        this.showMessage('*flaps*');
+                        this.tweens.add({
+                            targets: bat,
+                            x: this.s + (this.h - 2 * this.s) * Math.random(),
+                            y: this.s + (this.h - 2 * this.s) * Math.random(),
+                            ease: 'Sine.inOut',
+                            duration: 500
+                        });
+                    })
+                    .on('pointerdown', () => {
+                        if (this.holdingItem("🗡️ Simple Dagger") || this.holdingItem("🪄 Sol Beam")) { 
+                            this.interacted.push("batKilled");
+                            this.tweens.add({
+                                targets: bat,
+                                angle: `-=${2 * this.s}`,
+                                alpha: { from: 1, to: 0 },
+                                duration: 500,
+                                onComplete: () => {
+                                    bat.destroy();
+                                    this.time.delayedCall(50, ()=>{
+                                        this.spawnItem('🥩 Bat Meat', 
+                                                        765, 
+                                                        671, 
+                                                        "Food?", 
+                                                        "What am I going to do with this.");
+                                    });
+                                }
+                            });
+                        }  
                     });
-                });
+            }
         }
         else {
             let rightCell = this.createEntity("⛓️ Cell", 1202, 507);
-            rightCell.on('pointerover', () => {
+            rightCell.list[1].on('pointerover', () => {
+                this.checkVisual(rightCell.list[1]);
                 if (this.hasItem("🔑 Jail Key")) {
                     this.showMessage("I can open this cell.");
                 } else {
@@ -303,7 +387,7 @@ class JailCells extends AdventureScene {
             .on('pointerdown', () => {
                 if (this.holdingItem("🔑 Jail Key")) {
                     this.showMessage("*creak*");
-                    rightCell.setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
+                    rightCell.list[0].setText("⛓️ Unlocked Cell").setWordWrapWidth(1);
                     this.interacted.push("rightCell");
                     this.gotoScene('JailCells', 0);
                 }
@@ -320,6 +404,7 @@ class StoneHallway extends AdventureScene {
         super("StoneHallway", "Dark Hallway");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("stoneHallwayBg", "stoneHallway.jpg");
     }
@@ -335,8 +420,9 @@ class StoneHallway extends AdventureScene {
 
     if (!this.hasInteracted("zombie")) {
         let zombie = this.createEntity("🧟 Zombie Guard", 211, 647);
-        zombie.on('pointerover', () => {
+        zombie.list[1].on('pointerover', () => {
                 this.showMessage("Slow and wandering aimlessly.");
+                this.checkVisual(zombie.list[1]);
             })
             .on('pointerdown', () => {
                 if (this.holdingItem("🗡️ Simple Dagger") || this.holdingItem("🪄 Sol Beam")) {
@@ -381,7 +467,7 @@ class StoneHallway extends AdventureScene {
                 duration: 10000
             });
         }
-        else if (this.hasInteracted("zombie") && !this.hasItem("🔑 Guard Room Key")) {
+        else if (this.hasInteracted("zombie") && !this.hasItem("🔑 Guard Room Key") && !this.hasInteracted("guardDoor")) {
             this.spawnItem('🔑 Guard Room Key', 
                             211, 
                             647, 
@@ -394,8 +480,9 @@ class StoneHallway extends AdventureScene {
                 this.showMessage("I have opened the door to the guard room.");
             }
             let guardRoom = this.createEntity("Guard Room", 716, 594);
-            guardRoom.on('pointerover', () => {
+            guardRoom.list[1].on('pointerover', () => {
                     this.showMessage("Abandoned and stripped clean.");
+                    this.checkVisual(guardRoom.list[1]);
                 })
                     .on('pointerdown', () => {
                     this.gotoScene('GuardRoom', 0);
@@ -403,7 +490,8 @@ class StoneHallway extends AdventureScene {
         }
         else {
             let guardRoom = this.createEntity("🚪 Locked Door", 716, 594);
-            guardRoom.on('pointerover', () => {
+            guardRoom.list[1].on('pointerover', () => {
+                this.checkVisual(guardRoom.list[1]);
                 if (this.hasItem("🔑 Guard Room Key")) {
                     this.showMessage("I have a key for this door.");
                 } else {
@@ -412,9 +500,9 @@ class StoneHallway extends AdventureScene {
             })
             .on('pointerdown', () => {
                 if (this.holdingItem("🔑 Guard Room Key")) {
-                    // this.loseItem("Guard Room Key");
+                    this.loseItem("🔑 Guard Room Key");
                     this.showMessage("*rumbles*");
-                    guardRoom.setText("Guard Room").setWordWrapWidth(1);
+                    guardRoom.list[0].setText("Guard Room").setWordWrapWidth(1);
                     this.interacted.push("guardDoor");
                     this.gotoScene('GuardRoom');
                 }
@@ -431,6 +519,7 @@ class Armory extends AdventureScene {
         super("Armory", "Empty Armory");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("armoryBg", "armory.jpg");
     }
@@ -444,7 +533,10 @@ class Armory extends AdventureScene {
                             "", 
                             "MainArea");
         let arrow = this.createEntity("🏹 Broken Arrow", 200, 640);
-        arrow.on('pointerover', () => this.showMessage("Broken in half."))
+        arrow.list[1].on('pointerover', () => {
+                this.showMessage("Broken in half.")
+                this.checkVisual(arrow.list[1]);
+            })
             .on('pointerdown', () => {
                 this.showMessage("This is useless...");
                 this.tweens.add({
@@ -463,7 +555,7 @@ class Armory extends AdventureScene {
                             415, 
                             "A wand with a note next to it. It says \"Sol Beam\"", 
                             "Cool, this is way stronger than my dagger.");
-            wand.on('pointerdown', () => {
+            wand.list[1].on('pointerdown', () => {
                 this.interacted.push("gotSolBeam");
             });
         }
@@ -476,6 +568,7 @@ class BossRoom extends AdventureScene {
         super("BossRoom", "Throne Room");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("throneRoomBg", "throneRoom.jpg");
     }
@@ -491,8 +584,9 @@ class BossRoom extends AdventureScene {
 
         if (!this.hasInteracted("bossDefeated")) {
             let boss = this.createEntity(" ↼⚟❪◯❫⚞⇀ Apuloxizelth", 670, 657, "#FF0000");
-            boss.on('pointerover', () => {
+            boss.list[1].on('pointerover', () => {
                     this.showMessage("Wow, no way I can beat this entity with my simple dagger.");
+                    this.checkVisual(boss.list[1]);
                     this.interacted.push("bossSeen");
                 })
                 .on('pointerdown', () => {
@@ -561,6 +655,7 @@ class GuardRoom extends AdventureScene {
         super("GuardRoom", "Guard Room");
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("guardRoomBg", "guardRoom.jpg");
     }
@@ -583,9 +678,13 @@ class GuardRoom extends AdventureScene {
         }
 
         let rustedKey = this.createEntity("🔑 Rusted Key", 1117, 754);
-        rustedKey.on('pointerover', () => this.showMessage("Rusted beyond usage."))
+        rustedKey.list[1].on('pointerover', () => {
+                this.showMessage("Rusted beyond usage.")
+                this.checkVisual(rustedKey.list[1]);
+            })
             .on('pointerdown', () => {
                 this.showMessage("In this state, nothing can be opened with this.");
+                this.checkVisual(rustedKey.list[1]);
                 this.tweens.add({
                     targets: rustedKey,
                     x: '+=' + this.s,
@@ -603,6 +702,7 @@ class Intro extends Phaser.Scene {
         super('intro')
     }
     preload() {
+        this.load.plugin('rexroundrectangleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexroundrectangleplugin.min.js', true);
         this.load.path = "./assets/";
         this.load.image("introBg", "startingArea.jpg");
     }
@@ -638,6 +738,12 @@ class Summary extends AdventureScene {
         }
         if (this.hasInteracted("acceptedPerson")) {
             playerEvents.push("You graciously allowed the person to join you on your dungeon raid.");
+        }
+        if (this.hasInteracted("gavePersonFood") && this.hasInteracted("destroyedPerson")) {
+            playerEvents.push("You gave the person some bat meat and then destroyed them. What is this thought process???");
+        } 
+        else if (this.hasInteracted("gavePersonFood")) {
+            playerEvents.push("The person ate the suspicious bat meat you gave them. Hope it doesn't do anything...");
         }
         if (this.hasInteracted("killedByBoss") && this.hasInteracted("acceptedPerson")) {
             playerEvents.push("The person from the jail watches in confusion as you run at the unholy being with a simple dagger, and consequently get destroyed. Maybe they could've helped you???");
