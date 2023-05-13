@@ -92,6 +92,7 @@ class MainArea extends AdventureScene {
 
         let leave = this.createEntity("Leave", 660, 990, "#FFFFFF");
         leave.list[1].on('pointerover', () => {
+            this.checkVisual(leave.list[1]);
             if (this.hasItem("⚱️⚜️👑 Loot")) {
                 this.showMessage("Time to make a fortune selling this stuff!");
             }
@@ -103,7 +104,7 @@ class MainArea extends AdventureScene {
             }
         })
         .on('pointerdown', () => {
-            console.log(leaveConfirmation);
+            // console.log(leaveConfirmation);
             if (leaveConfirmation == 0) {
                 this.showMessage("Are you sure you want to leave?");
             }
@@ -370,7 +371,10 @@ class JailCells extends AdventureScene {
                                     });
                                 }
                             });
-                        }  
+                        } 
+                        else {
+                            this.showMessage("Maybe I can use a weapon on it.");
+                        } 
                     });
             }
         }
@@ -584,6 +588,14 @@ class BossRoom extends AdventureScene {
 
         if (!this.hasInteracted("bossDefeated")) {
             let boss = this.createEntity(" ↼⚟❪◯❫⚞⇀ Apuloxizelth", 670, 657, "#FF0000");
+            this.tweens.add({
+                targets: boss,
+                y: 400,
+                repeat: -1,
+                yoyo: true,
+                ease: 'Sine.inOut',
+                duration: 10000
+            });
             boss.list[1].on('pointerover', () => {
                     this.showMessage("Wow, no way I can beat this entity with my simple dagger.");
                     this.checkVisual(boss.list[1]);
@@ -774,7 +786,10 @@ class Summary extends AdventureScene {
         else if (!this.hasInteracted("killedByBoss") && !this.hasInteracted("bossDefeated")) {
             playerEvents.push("You ran away from the dungeon. Sadly, no loot resulted from that.");
         }
-        if (this.hasInteracted("giftedPerson")) {
+        if (this.hasInteracted("giftedPerson") && this.hasInteracted("gavePersonFood")) {
+            playerEvents.push("You gave the random person you saved everything of value from the dungeon. Is that good?");
+        }
+        else if (this.hasInteracted("giftedPerson")) {
             playerEvents.push("You graciously give the random person you saved from the jail all of your loot. Good?");
         }
         // playerEvents.push("text summaryy number 1 placeholder text blah blha aifhawkhakfjmawjyfjmafja.");

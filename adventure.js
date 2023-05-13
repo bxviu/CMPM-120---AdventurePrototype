@@ -62,9 +62,9 @@ class AdventureScene extends Phaser.Scene {
         let {x,y,isDown} = this.input.activePointer;
         this.mousex = x;
         this.mousey = y;
-        one.on('down', () => {
-            console.log(this.mousex, this.mousey);
-        });
+        // one.on('down', () => {
+        //     console.log(this.mousex, this.mousey);
+        // });
         this.input.on('pointerdown', (event) => {
             if (this.heldItem != null) {
                 this.returnItem(this.heldItem);
@@ -328,7 +328,7 @@ class AdventureScene extends Phaser.Scene {
     gotoScene(key, transitionTime = this.transitionDuration) {
         this.cameras.main.fade(transitionTime, 0, 0, 0);
         this.time.delayedCall(transitionTime, () => {
-            console.log(this.children.list);
+            // console.log(this.children.list);
             this.children.list.forEach(x => x.destroy());
             this.scene.start(key, { inventory: this.inventory, interacted:this.interacted });
         });
